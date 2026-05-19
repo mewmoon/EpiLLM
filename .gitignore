@@ -1,0 +1,7 @@
+# 彻底拉黑权重目录和 pth 文件
+out/
+*.pth
+
+# 彻底拉黑 Python 缓存
+__pycache__/
+*.pyc
