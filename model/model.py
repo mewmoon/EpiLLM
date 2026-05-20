@@ -1,5 +1,5 @@
 import math
-from transformers import PretrainedConfig, PreTrainedModel
+from transformers import GenerationMixin, PretrainedConfig, PreTrainedModel
 
 import torch
 import torch.nn.functional as F
@@ -156,6 +156,7 @@ class EpiAttention(torch.nn.Module):
         use_cache=False,
         attention_mask=None,
     ):
+        # print("Attention:", attention_mask == None)
         bs, seq_len, _ = x.shape
         xq, xk, xv = self.q_proj(x), self.k_proj(x), self.v_proj(x)
         xq = xq.view(bs, seq_len, self.n_local_heads, self.head_dim)
@@ -297,11 +298,14 @@ class EpiModel(torch.nn.Module):
             presents.append(present)
 
         hidden_state = self.norm(hidden_state)
-        aux_loss = None  # 辅助损失
+        aux_loss = sum(
+            [l.mlp.aux_loss for l in self.blocks if isinstance(l.mlp, EpiMoEMLP)],
+            hidden_state.new_zeros(1).squeeze(),
+        )
         return hidden_state, presents, aux_loss
 
 
-class EpiForCausalLM(PreTrainedModel):
+class EpiForCausalLM(PreTrainedModel, GenerationMixin):
     config_class = EpiConfig
 
     def __init__(self, config: EpiConfig = None):
