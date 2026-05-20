@@ -10,6 +10,7 @@ from torch.cuda.amp import autocast, GradScaler
 
 from dataset.llm_dataset import PretrainDataset, SFTDataset
 from trainer_utils import init_model
+from model.model_lora import apply_lora, freeze_model
 
 # ==================== 配置超参数 ====================
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
@@ -28,15 +29,20 @@ NUM_EPOCHS = 1  # 根据需求修改圈数
 # 2. 初始化模型和数据
 model, tokenizer = init_model()
 model.to(DEVICE)
+apply_lora(model)
+lora_params, _, _ = freeze_model(model)
 
 # dataset = PretrainDataset("../dataset/pretrain.jsonl", tokenizer, max_length=512)
 dataset = SFTDataset("../dataset/sft_mini_512.jsonl", tokenizer, max_length=512)
+
+
 train_loader = DataLoader(
     dataset, batch_size=MICRO_BATCH_SIZE, shuffle=True, drop_last=True
 )
 
 # 3. 设置优化器与混合精度加速
-optimizer = torch.optim.AdamW(model.parameters(), lr=LEARNING_RATE, weight_decay=0.1)
+# optimizer = torch.optim.AdamW(model.parameters(), lr=LEARNING_RATE, weight_decay=0.1)
+optimizer = torch.optim.AdamW(lora_params, lr=LEARNING_RATE, weight_decay=0.1)
 scaler = GradScaler()  # 混合精度 AMP 缩放器，防止 FP16 梯度下溢
 
 

@@ -5,3 +5,4 @@ out/
 # 彻底拉黑 Python 缓存
 __pycache__/
 *.pyc
+test*

@@ -19,7 +19,7 @@ class EpiConfig(PretrainedConfig):
         hidden_size: int = 512,
         intermediate_size: int = None,
         max_position_embeddings: int = 32768,
-        num_hidden_layers: int = 8,
+        num_hidden_layers: int = 2,
         num_attention_heads: int = 8,
         num_key_value_heads: int = 2,
         vocab_size: int = 6400,
