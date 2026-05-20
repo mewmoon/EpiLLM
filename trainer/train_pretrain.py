@@ -8,7 +8,7 @@ import torch
 from torch.utils.data import DataLoader
 from torch.cuda.amp import autocast, GradScaler
 
-from dataset.llm_dataset import PretrainDataset
+from dataset.llm_dataset import PretrainDataset, SFTDataset
 from trainer_utils import init_model
 
 # ==================== 配置超参数 ====================
@@ -29,7 +29,8 @@ NUM_EPOCHS = 1  # 根据需求修改圈数
 model, tokenizer = init_model()
 model.to(DEVICE)
 
-dataset = PretrainDataset("../dataset/pretrain.jsonl", tokenizer, max_length=512)
+# dataset = PretrainDataset("../dataset/pretrain.jsonl", tokenizer, max_length=512)
+dataset = SFTDataset("../dataset/sft_mini_512.jsonl", tokenizer, max_length=512)
 train_loader = DataLoader(
     dataset, batch_size=MICRO_BATCH_SIZE, shuffle=True, drop_last=True
 )
