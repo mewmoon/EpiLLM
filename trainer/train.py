@@ -8,7 +8,5 @@ from trainer_utils import init_model
 from torch.utils.data import Subset
 
 model, tokenizer = init_model()
-dataset = DPODataset("../dataset/dpo.jsonl", tokenizer, max_length=512)
-indices = range(100)
-dataset = Subset(dataset, indices)
-print(len(dataset))
+dataset = RLAIFDataset("../dataset/rlaif.jsonl", tokenizer, max_length=512)
+print(dataset[0])
